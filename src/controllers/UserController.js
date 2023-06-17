@@ -190,7 +190,8 @@ const deleteuser = (req, res) => {
 const updateUser = (req, res) => {
   let returnObj = {};
   let reqBody = req.body;
-  const { user_id, firstname, lastname, email, mobile, city } = reqBody;
+  const { user_id, firstname, lastname, email, mobile, city, lastmodifiedby } =
+    reqBody;
 
   const schema = Joi.object({
     user_id: Joi.string().required(),
@@ -206,34 +207,57 @@ const updateUser = (req, res) => {
 
   Joi.validate(reqBody, schema, (err, value) => {
     if (!err) {
-      sqlQuery = ` select * from users where user_id = '${user_id}' `;
+      sqlQuery = ` select * from users where email = '${email}' OR mobile = '${mobile}'  `;
       console.log("sqlQuery=======?>", sqlQuery);
 
-      conn.query(sqlQuery, (error, results) => {
-        if (results.length > 0) {
-          sqlQuery = ` update  users set firstname ='${firstname}',lastname ='${lastname}',email ='${email}',mobile ='${mobile}',city ='${city}'  where user_id = '${user_id}' `;
+      conn.query(sqlQuery, (error, data) => {
+        if (data.length > 0) {
+          if (
+            reqBody.email == data[0].email &&
+            reqBody.user_id != data[0].user_id
+          ) {
+            console.log("email true==========>");
+            returnObj.status = "fail";
+            returnObj.returnmsg = "Email Already Exists.";
+            returnObj.returnval = [];
+            return res.status(200).json(returnObj);
+          }
 
-          console.log("sqlQuery=======?>", sqlQuery);
+          if (
+            reqBody.mobile == data[0].mobile &&
+            reqBody.user_id != data[0].user_id
+          ) {
+            console.log("mobile true==========>");
+            returnObj.status = "fail";
+            returnObj.returnmsg = "Mobile Already Exists.";
+            returnObj.returnval = [];
+            return res.status(200).json(returnObj);
+          }
+
+          console.log("inside else========>");
+          sqlQuery = ` update  users set firstname ='${firstname}',lastname ='${lastname}',email ='${email}',mobile ='${mobile}',city ='${city}',lastmodifiedby ='${lastmodifiedby}',updated_at = CURRENT_TIMESTAMP  where user_id = '${user_id}' `;
 
           conn.query(sqlQuery, (error, results1) => {
+            console.log("results1===>", results1);
             if (error) throw error;
             if (results1.affectedRows > 0) {
               returnObj.status = "sucess";
               returnObj.returnmsg = "User updated succesfully.";
               returnObj.returnval = [];
-              res.status(200).json(returnObj);
+              return res.status(200).json(returnObj);
+            } else {
+              returnObj.status = "fail";
+              returnObj.returnmsg = "Something went wrong";
+              returnObj.returnval = [];
+              return res.status(200).json(returnObj);
             }
           });
-        } else {
-          returnObj.status = "fail";
-          returnObj.returnmsg = "User does not exist.";
-          res.status(200).json(returnObj);
         }
       });
     } else {
       returnObj.returnmsg = "InputException";
       returnObj.returnval = err.details[0].message;
-      res.status(400).json(returnObj);
+      return res.status(400).json(returnObj);
     }
   });
 };
