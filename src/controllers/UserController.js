@@ -16,6 +16,8 @@ const getusers = (req, res) => {
       sqlQuery =
         "Select user_id,firstname,lastname,email,mobile,userrole,isactive,createdby,DATE(created_at) AS created_date,lastmodifiedby,updated_at from users where 1= 1 ";
 
+      console.log("sqlQuery", sqlQuery);
+
       if (typeof reqBody.user_id != "undefined" && reqBody.user_id != "") {
         sqlQuery += " and user_id = " + reqBody.user_id;
       }
