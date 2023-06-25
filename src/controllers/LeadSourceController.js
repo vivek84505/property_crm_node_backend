@@ -23,7 +23,7 @@ const getleadsourceall = (req, res) => {
         sqlQuery += " and leadsourceid = " + reqBody.leadsourceid;
       }
 
-      sqlQuery += " order by lastmodifieddate desc";
+      sqlQuery += " order by createddate desc";
 
       console.log("Query => ", sqlQuery);
 
@@ -206,7 +206,6 @@ const updateleadsource = (req, res) => {
           sqlQuery = ` update  tbl_leadsourcemaster set leadsource ='${leadsource}', lastmodifiedby ='${lastmodifiedby}',lastmodifieddate = CURRENT_TIMESTAMP  where leadsourceid = '${leadsourceid}' `;
 
           conn.query(sqlQuery, (error, results1) => {
-            console.log("results1===>", results1);
             if (error) throw error;
             if (results1.affectedRows > 0) {
               returnObj.status = "sucess";
