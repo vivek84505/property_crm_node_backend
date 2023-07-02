@@ -14,7 +14,7 @@ const getleadsourceall = (req, res) => {
   Joi.validate(reqBody, schema, (err, value) => {
     if (!err) {
       sqlQuery =
-        "Select leadsourceid,leadsource,isactive,createdby,DATE(createddate) AS createddate,lastmodifiedby,DATE(lastmodifieddate) as lastmodifieddate from tbl_leadsourcemaster where 1= 1 ";
+        "Select leadsourceid,leadsource,isactive,createdby,DATE(createddate) AS createddate,lastmodifiedby,COALESCE(DATE_FORMAT(lastmodifieddate, '%Y-%m-%d'), '') AS lastmodifieddate from tbl_leadsourcemaster where 1= 1 ";
 
       if (
         typeof reqBody.leadsourceid != "undefined" &&
