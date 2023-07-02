@@ -200,7 +200,7 @@ const updateUser = (req, res) => {
     email: Joi.string().email().allow(),
     mobile: Joi.string().allow(),
     lastmodifiedby: Joi.string().allow(),
-    user_role: Joi.number().allow(),
+    userrole: Joi.string().required(),
     city: Joi.string().allow(),
     address: Joi.string().allow(),
   });
